@@ -1,0 +1,30 @@
+{
+    "STATEFIP": {
+        "type": "bitmap",
+        "plain": false,
+        "hash": false,
+        "gid": false,
+        "runtime": true
+    },
+    "AGE": {
+        "type": "range",
+        "plain": false,
+        "hash": false,
+        "gid": false,
+        "runtime": true
+    },
+    "OCC": {
+        "type": "roaring",
+        "plain": false,
+        "hash": false,
+        "gid": false,
+        "runtime": true
+    },
+    "INCTOT": {
+        "type": "range",
+        "plain": false,
+        "hash": false,
+        "gid": false,
+        "runtime": true
+    }
+}

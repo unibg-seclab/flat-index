@@ -1,0 +1,11 @@
+{
+    "input": "hdfs://namenode:8020/dataset/transactions.csv",
+    "output": "hdfs://namenode:8020/anonymized/transactions.csv",
+    "quasiid_columns": ["purchaseamount", "date", "category", "company"],
+    "column_score": "span",
+    "fragmentation": "mondrian",
+    "repartition": "repartitionByRange",
+    "K": 25,
+    "use_categorical": ["category", "company"],
+    "k_flat": true
+}

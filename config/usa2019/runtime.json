@@ -1,0 +1,30 @@
+{
+    "ST": {
+        "type": "bitmap",
+        "plain": false,
+        "hash": false,
+        "gid": false,
+        "runtime": true
+    },
+    "AGEP": {
+        "type": "range",
+        "plain": false,
+        "hash": false,
+        "gid": false,
+        "runtime": true
+    },
+    "OCCP": {
+        "type": "roaring",
+        "plain": false,
+        "hash": false,
+        "gid": false,
+        "runtime": true
+    },
+    "WAGP": {
+        "type": "range",
+        "plain": false,
+        "hash": false,
+        "gid": false,
+        "runtime": true
+    }
+}

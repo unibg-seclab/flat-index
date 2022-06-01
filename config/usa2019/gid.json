@@ -1,0 +1,26 @@
+{
+    "ST": {
+        "type": "set",
+        "plain": false,
+        "hash": false,
+        "gid": true
+    },
+    "AGEP": {
+        "type": "range",
+        "plain": false,
+        "hash": false,
+        "gid": true
+    },
+    "OCCP": {
+        "type": "set",
+        "plain": false,
+        "hash": false,
+        "gid": true
+    },
+    "WAGP": {
+        "type": "range",
+        "plain": false,
+        "hash": false,
+        "gid": true
+    }
+}

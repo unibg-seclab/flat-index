@@ -1,0 +1,30 @@
+{
+    "purchaseamount": {
+        "type": "range",
+        "plain": false,
+        "hash": false,
+        "gid": true,
+	"runtime": false
+    },
+    "date": {
+        "type": "range",
+        "plain": false,
+        "hash": false,
+        "gid": true,
+	"runtime": false
+    },
+    "company": {
+        "type": "roaring",
+        "plain": false,
+        "hash": false,
+        "gid": true,
+	"runtime": false
+    },
+    "category": {
+        "type": "roaring",
+        "plain": false,
+        "hash": false,
+        "gid": true,
+	"runtime": false
+    }
+}

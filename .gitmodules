@@ -1,0 +1,3 @@
+[submodule "submodules/spark-mondrian"]
+	path = submodules/spark-mondrian
+	url = git@github.com:mosaicrown/mondrian.git
