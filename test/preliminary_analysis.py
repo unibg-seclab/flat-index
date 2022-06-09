@@ -101,11 +101,8 @@ def get_configuration(config):
         'usa_2018': [],
         'usa_2019': ["AGEP"],
     }
-    multi_column = {
-        'usa_2019': [f"{selectivity}/usa2019/usa2019_selectivity_2_cols.csv"]    
-    }
 
-    return attribute_dict[config], dataset_dict[config], basename_dict[config], k_dict[config], l_dict[config], sensitive_dict[config], range_dict.get(config, []), multi_column.get(config, [])
+    return attribute_dict[config], dataset_dict[config], basename_dict[config], k_dict[config], l_dict[config], sensitive_dict[config], range_dict.get(config, [])
 
 
 def check_element(x, elem):
@@ -180,13 +177,6 @@ def test_ranges(ranges):
     return correct_nums, mult_nums, f_pos_rates, covered_range
 
 
-def test_2_attr(col_1, col_2, val_1, val_2):
-    mult_nums = []
-    correct_num = len(df[(df[col_1]== val_1) & (df[col_2]== val_2)].index)
-    mult_num = len(index_maps[col_1][val_1].intersection(index_maps[col_2][val_2]))
-    return correct_num, mult_num
-
-
 def parent_folder_creation(path):
     output_path = path
     output_dir = Path(output_path)
@@ -204,22 +194,15 @@ def file_creation_plot(path, filename, plt):
     plt.savefig(f"{output_path}/{filename}")
 
 
-def parse_file(path):
-    multi_col_queries = pd.read_csv(path)
-    multi_col_queries.value =  multi_col_queries.value.map(eval)
-    multi_col_queries = multi_col_queries[multi_col_queries.selectivity <= 0.1]
-    return multi_col_queries[["column","value"]]
-
-
 if __name__ == '__main__':
     root = os.path.realpath(os.path.join(__file__, "..", ".."))
     test = os.path.join(root, "test")
-    datasets = os.path.join(test, "datasets")
+    datasets = os.path.join(root, "datasets")
     results = os.path.join(test, "results", "preliminary-analysis")
     selectivity = os.path.join(test, "results", "query", "selectivity_files")
 
     config = sys.argv[1]
-    attributes, dataset, basename, k_params, l_params, sensitive, range_attributes, multi_column = get_configuration(config)
+    attributes, dataset, basename, k_params, l_params, sensitive, range_attributes = get_configuration(config)
     counters = {}
     global df
     # Read the raw dataset
@@ -242,7 +225,6 @@ if __name__ == '__main__':
     bucket_stat = {'k':[], 'l':[], 'portion': [], 'mean':[], 'w_mean':[], 'variance':[], 'false rate': [],'w_variance':[], 'max':[], 'min': []}
     query_stat = {'k':[], 'l':[], 'portion': [],'column':[], 'mean':[], 'w_mean':[], 'variance':[], 'false rate': [],'w_variance':[], 'max':[], 'min': []}
     query_stat_range = {'k':[], 'l':[], 'portion': [],'column':[], 'mean':[], 'w_mean':[], 'variance':[], 'false rate': [],'w_variance':[], 'max':[], 'min': []}
-    mult_attr = {'k':[], 'l':[],'column':[],'portion':[],'mean':[], 'w_mean':[], 'variance':[], 'w_variance':[], 'max':[], 'min': []}
     bucket_query = {'k':[], 'l':[], 'portion': [], 'mean':[], 'w_mean':[], 'variance':[], 'false rate': [],'w_variance':[], 'max':[], 'min': []}
     for l in l_params:
         for k in k_params:
@@ -463,95 +445,6 @@ if __name__ == '__main__':
                         query_stat_range['portion'].append(key)
                     file_creation_csv(f"{results}/tables/statistics/{config}", "stats_queries.csv", query_stat)
                     file_creation_csv(f"{results}/tables/statistics/{config}", "stats_queries_over_range.csv", query_stat_range)
-            if len(multi_column == 0):
-                    for col_1,col_2 in combinations(attributes, 2):
-                        vals_1 = np.sort(df[col_1].unique())
-                        vals_2 = np.sort(df[col_2].unique())
-                        mult_nums = []
-                        correct_nums = []
-                        total = len(vals_1) * len(vals_2)
-                        count = 0
-                        for val_1 in vals_1:
-                            for val_2 in vals_2:
-                                count += 1
-                                if count % 100 == 0:
-                                    print(f"({col_1}-{col_2})({count}/{total})")
-                                correct_num, mult_num = test_2_attr(col_1, col_2, val_1, val_2)
-                                if correct_num == 0:
-                                    continue
-                                mult_nums.append(mult_num / correct_num)
-                                correct_nums.append(correct_num)
-                        all_info  = zip(correct_nums, mult_nums)
-                        prev = 0.0
-                        for key in np.linspace(0.1,1,1000,endpoint=False):
-                            filtered = []
-                            for x in all_info:
-                                if prev <= x[0] / len(df.index) and x[0] / len(df.index):
-                                    filtered.append(x)
-                            prev = key
-                            filtered, filtered_copy = tee(filtered)
-                            mult_nums, correct_nums = ([x[1] for x in filtered], [x[0] for x in filtered_copy])
-                            if len(correct_nums) == 0 and len(mult_nums) == 0:
-                                continue
-                            mean = sum(mult_nums)/ len(mult_nums)
-                            w_mean =  sum([x*y for x,y in zip(mult_nums , correct_nums)])/ sum(correct_nums)
-                            var =  np.var(mult_nums)
-                            w_var = sum([y * ((x - w_mean)**2) for x,y in zip(mult_nums , correct_nums)]) / sum(correct_nums)
-                            mult_attr['k'].append(k)
-                            mult_attr['l'].append(l)
-                            mult_attr['portion'].append(key)
-                            mult_attr['column'].append(f"{col_1}-{col_2}")
-                            mult_attr['mean'].append(mean)
-                            mult_attr['w_mean'].append(w_mean)
-                            mult_attr['variance'].append(var)
-                            mult_attr['w_variance'].append(w_var)
-                            mult_attr['max'].append(max(mult_nums))
-                            mult_attr['min'].append(min(mult_nums))
-            else:
-                   for file in multi_column:
-                        queries = parse_file(file)
-                        columns = [x.split("_") for x in queries.columns.unique()]
-                        for col_1,col_2 in columns:
-                                mult_nums = []
-                                correct_nums = []
-                                total = len(queries[df.columns == f"{col_1}_{col_2}"].index)
-                                count = 0
-                                for val_1 in vals_1:
-                                    for val_2 in vals_2:
-                                        count += 1
-                                        if count % 100 == 0:
-                                            print(f"({col_1}-{col_2})({count}/{total})")
-                                        correct_num, mult_num = test_2_attr(col_1, col_2, val_1, val_2)
-                                        if correct_num == 0:
-                                            continue
-                                        mult_nums.append(mult_num / correct_num)
-                                        correct_nums.append(correct_num)
-                                all_info  = zip(correct_nums, mult_nums)
-                                prev = 0.0
-                                for key in np.linspace(0.1,1,1000,endpoint=False):
-                                    filtered = []
-                                    for x in all_info:
-                                        if prev <= x[0] / len(df.index) and x[0] / len(df.index):
-                                            filtered.append(x)
-                                    prev = key
-                                    filtered, filtered_copy = tee(filtered)
-                                    mult_nums, correct_nums = ([x[1] for x in filtered], [x[0] for x in filtered_copy])
-                                    if len(correct_nums) == 0 and len(mult_nums) == 0:
-                                        continue
-                                    mean = sum(mult_nums)/ len(mult_nums)
-                                    w_mean =  sum([x*y for x,y in zip(mult_nums , correct_nums)])/ sum(correct_nums)
-                                    var =  np.var(mult_nums)
-                                    w_var = sum([y * ((x - w_mean)**2) for x,y in zip(mult_nums , correct_nums)]) / sum(correct_nums)
-                                    mult_attr['k'].append(k)
-                                    mult_attr['l'].append(l)
-                                    mult_attr['portion'].append(key)
-                                    mult_attr['column'].append(f"{col_1}-{col_2}")
-                                    mult_attr['mean'].append(mean)
-                                    mult_attr['w_mean'].append(w_mean)
-                                    mult_attr['variance'].append(var)
-                                    mult_attr['w_variance'].append(w_var)
-                                    mult_attr['max'].append(max(mult_nums))
-                                    mult_attr['min'].append(min(mult_nums))
 
                                 
             for key in global_stat.keys():
@@ -614,6 +507,5 @@ if __name__ == '__main__':
         file_creation_csv(f"{results}/tables/statistics/{config}", "stats.csv", statistics)
         file_creation_csv(f"{results}/tables/statistics/{config}", "stats_queries.csv", query_stat)
         file_creation_csv(f"{results}/tables/statistics/{config}", "stats_queries_over_range.csv", query_stat_range)
-        file_creation_csv(f"{results}/tables/statistics/{config}", "2_attr_queries.csv", mult_attr)
         file_creation_csv(f"{results}/tables/statistics/{config}", "aggregate.csv", bucket_stat)
         file_creation_csv(f"{results}/tables/statistics/{config}", "aggregate_queries.csv", bucket_query)
