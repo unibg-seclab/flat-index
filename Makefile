@@ -95,11 +95,11 @@ _setup_submodule:
 datasets: | _usa2019 _transactions
 
 _usa2019:
-	@ $(eval datasets := $(shell ls datasets/$(basename $(notdir $@))/*.zip))
-	@ $(foreach dataset,$(datasets), unzip -o -d datasets/$(basename $(notdir $@)) $(dataset);)
+	@ $(eval datasets := $(shell ls datasets/usa2019/*.zip))
+	@ $(foreach dataset,$(datasets), unzip -o -d datasets/usa2019 $(dataset);)
 
 _transactions:
-	@ $(eval datasets := $(shell ls -d datasets/transactions/transactions*))
+	@ $(eval datasets := $(shell ls -d datasets/transactions/transactions* | grep -v '\.csv'))
 	@ $(foreach dataset,$(datasets),cat $(dataset)/$(notdir $(dataset))_part.tgz_* | tar xz -C $(dir $(dataset));)
 
 USA2018_URL="https://www2.census.gov/programs-surveys/acs/data/pums/2018/1-Year/csv_pus.zip"
