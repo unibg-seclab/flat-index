@@ -1,4 +1,4 @@
-.PHONY: all baseline baseline_subset clean datasets preprocess preprocess_hybrid preprocess_kv preprocess_kv_mapping preprocess_norm query query_hybrid query_kv query_kv_mapping query_norm run select_columns stop submodule_setup test test_mapping test_categorical_mapping test_performance test_performance_hybrid test_performance_kv test_performance_kv_mapping test_subset_performance test_subset_performance_hybrid test_subset_performance_kv test_subset_performance_kv_mapping update usa2018 usa2018_simulation usa2019 usa2019_simulation visualization
+.PHONY: addlicense all baseline baseline_subset clean datasets preprocess preprocess_hybrid preprocess_kv preprocess_kv_mapping preprocess_norm query query_hybrid query_kv query_kv_mapping query_norm run stop test test_mapping test_categorical_mapping test_performance test_performance_hybrid test_performance_kv test_performance_kv_mapping test_subset_performance test_subset_performance_hybrid test_subset_performance_kv test_subset_performance_kv_mapping update usa2018 usa2018_simulation usa2019 usa2019_simulation visualization
 
 SHELL			:= /bin/bash
 MAKE			:= make --no-print-directory
@@ -80,19 +80,19 @@ addlicense:
 
 
 ### SUBMODULE ###
-# This target should be run only ONCE right after cloning the parent repository
-# Submodule changes are not tracked from the parent repository
-submodule_setup:
-	@ git submodule update --init 
-	@ git config submodule.submodules/spark-mondrian.ignore all
-	@ cd submodules/spark-mondrian; git checkout k-flat; 
+.submodule.build:
+	@ echo -e "[*] Configure indexing submodule.\n"
+	@ make _setup_submodule
+	@ touch $@
 
-copy_configs:
+_setup_submodule:
+	@ git submodule update --init
+	@ cd submodules/spark-mondrian; git checkout k-flat;
 	@ $(eval configs := $(shell ls k-flat-config/))
 	@ $(foreach config,$(configs), cp k-flat-config/$(config) submodules/spark-mondrian/distributed/config;)
 
 ### MANAGE DATASETS ###
-datasets: | usa2019 transactions
+datasets: | _usa2019 _transactions
 
 _usa2019:
 	@ $(eval datasets := $(shell ls datasets/$(basename $(notdir $@))/*.zip))
@@ -103,16 +103,16 @@ _transactions:
 	@ $(foreach dataset,$(datasets),cat $(dataset)/$(notdir $(dataset))_part.tgz_* | tar xz -C $(dir $(dataset));)
 
 USA2018_URL="https://www2.census.gov/programs-surveys/acs/data/pums/2018/1-Year/csv_pus.zip"
-usa2018: copy_configs
+usa2018: .submodule.build
 	@ $(MAKE) _download URL=$(USA2018_URL) OUTPUT=datasets/usa2018/usa2018.csv
 	@ $(MAKE) _k_flat INPUT=datasets/usa2018/usa2018.csv K="5 25"
 
 USA2019_URL="https://www2.census.gov/programs-surveys/acs/data/pums/2019/1-Year/csv_pus.zip"
-usa2019: copy_configs
+usa2019: .submodule.build
 	@ $(MAKE) _download URL=$(USA2019_URL) OUTPUT=datasets/usa2019/usa2019.csv
 	@ $(MAKE) _k_flat INPUT=datasets/usa2019/usa2019.csv K="10 25 50 75 100"
 
-transactions: copy_configs _transactions
+transactions: .submodule.build _transactions
 	@ cp datasets/transactions/transactions.csv submodules/spark-mondrian/distributed/dataset
 	@ $(MAKE) -C submodules/spark-mondrian/distributed transactions WORKERS=20 WORKER_MEMORY=5G DRIVER_MEMORY=15G
 	@ cp submodules/spark-mondrian/distributed/anonymized/transactions.csv datasets/transactions/transactions_25.csv
@@ -201,7 +201,7 @@ redis: check_deps .redis.build
 	docker-compose up -d redis
 
 stop: check_deps
-	@ echo -e "[*] Shutting down PostreSQL database.\n"
+	@ echo -e "[*] Shutting down databases.\n"
 	docker-compose kill
 
 
@@ -264,12 +264,6 @@ query_norm: $(MAPPING_NORM) upload_norm
 
 
 ### PAPER TESTS ###
-.submodule.build:
-	@ echo -e "[*] Configure indexing submodule.\n"
-	@ make submodule_setup
-	@ make apply_patch
-	@ touch $@
-
 test: datasets .submodule.build $(VENV)
 	@ echo -e "\n[*] EVALUATE TOKEN COLLISIONS WITH VARYING SIZE OF THE TOKENS"
 	$(PYTHON) test/collision/test_token_collisions.py --token-sizes 1 2 3 4 --token-numbers 1 2 3 4 5 6 7 8 9 10 20 30 40 50 60 70 80 90 100 200 300 400 500 600 700 800 900 1000 2000 3000 4000 5000 6000 7000 8000 9000 10000 20000 30000 40000 50000 60000 70000 80000 90000 100000 200000 300000 400000 500000 600000 700000 800000 900000
@@ -281,15 +275,15 @@ test: datasets .submodule.build $(VENV)
 
 
 ### PAPER FIGURES ###
-visualization: $(VENV)
-	# @ echo -e "\n[*] PRODUCE FIGURES SHOWING INDICES DISTRIBUTION IN test/results/indices-distribution"
-	# $(MAKE) preprocess INPUT=datasets/usa2019/usa2019.csv ANONYMIZED=datasets/usa2019/usa2019_25.csv TYPE=config/usa2019/runtime.json
-	# $(PYTHON) test/indices_distribution.py -k 25 datasets/usa2019/usa2019.csv datasets/usa2019/usa2019_25.csv datasets/wrapped/usa2018.csv
-	# @ echo -e "\n[*] PRODUCE FIGURES SHOWING TOKEN COLLISIONS IN test/results/collision"
-	# $(PYTHON) test/collision/plot_token_collisions.py
-	# @ echo -e "\n[*] PRODUCE FIGURES SHOWING INDEX SIZE IN test/results/mapping"
-	# $(PYTHON) test/mapping/index_size_vs_k.py --plot-only
-	# $(PYTHON) test/mapping/index_size_analysis.py --plot-only
+visualization: _usa2019 $(VENV)
+	@ echo -e "\n[*] PRODUCE FIGURES SHOWING INDICES DISTRIBUTION IN test/results/indices-distribution"
+	$(MAKE) preprocess INPUT=datasets/usa2019/usa2019.csv ANONYMIZED=datasets/usa2019/usa2019_25.csv TYPE=config/usa2019/runtime.json
+	$(PYTHON) test/indices_distribution.py -k 25 datasets/usa2019/usa2019.csv datasets/usa2019/usa2019_25.csv datasets/wrapped/usa2018.csv
+	@ echo -e "\n[*] PRODUCE FIGURES SHOWING TOKEN COLLISIONS IN test/results/collision"
+	$(PYTHON) test/collision/plot_token_collisions.py
+	@ echo -e "\n[*] PRODUCE FIGURES SHOWING INDEX SIZE IN test/results/mapping"
+	$(PYTHON) test/mapping/index_size_vs_k.py --plot-only
+	$(PYTHON) test/mapping/index_size_analysis.py --plot-only
 	@ echo -e "\n[*] PRODUCE FIGURES SHOWING PERFORMANCE EVALUATIONS IN test/results/query/images/*"
 	test/query/produce-performance-evaluation-figures.sh
 
@@ -333,10 +327,6 @@ test_categorical_mapping_gid: $(VENV)
 	@ $(foreach dataset,$(datasets), $(PYTHON) test/mapping/mapping.py -b -c "$(CATEGORICAL)" -t set "$(DATASETS)/$(dataset)" "test/results/mapping/$(basename $(dataset))_$(CATEGORICAL)_set_GID.pkl" -p $(PORTION) -g;)
 	@ echo -e "\n[*] ROARING BITMAP CATEGORICAL MAPPINGS"
 	@ $(foreach dataset,$(datasets), $(PYTHON) test/mapping/mapping.py -b -c "$(CATEGORICAL)" -t roaring "$(DATASETS)/$(dataset)" "test/results/mapping/$(basename $(dataset))_$(CATEGORICAL)_roaring_GID.pkl" -p $(PORTION) -g;)
-
-### RETRIEVE DATA TO SELECT BEST COLUMNS ###
-select_columns: upload_plain upload
-	$(PYTHON) test/query/select_columns.py $(POSTGRES_URL) $(MAPPING) test/results/query/selection
 
 
 ### TEST QUERY PERFORMANCE ###

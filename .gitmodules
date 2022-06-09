@@ -1,3 +1,4 @@
 [submodule "submodules/spark-mondrian"]
+	ignore = all
 	path = submodules/spark-mondrian
 	url = https://github.com/mosaicrown/mondrian.git
