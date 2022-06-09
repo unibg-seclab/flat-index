@@ -238,14 +238,19 @@ parser.add_argument('-c', '--column', metavar='COLUMN', help='column name')
 parser.add_argument('-t',
                     '--type',
                     metavar='TYPE',
-                    help='type of mapping: range (default), interval-tree, ' +
-                         'bitmap, roaring and set')
+                    choices=['bitmap', 'interval-tree', 'range', 'roaring',
+                             'set'],
+                    default='range',
+                    help='type of mapping: bitmap, interval-tree, '
+                         'range (default), roaring and set')
 parser.add_argument('-b', '--bz2format',
                     dest='to_compress',
                     action='store_true',
                     help='save the pickle compressed using bz2')
 parser.add_argument('-p', '--portion',
                     dest='portion',
+                    type=int,
+                    default=0,
                     help='portion of dataset used')
 parser.add_argument('-g', '--gid',
                     dest='use_gid',
@@ -259,9 +264,9 @@ dataset = args.input
 destination = args.output
 column = args.column
 to_compress = args.to_compress
-mapping_type = args.type if args.type else "range"
-portion = int(args.portion)
-use_gid = args.use_gid if args.use_gid else False
+mapping_type = args.type
+portion = args.portion
+use_gid = args.use_gid
 
 if dataset.split(".")[-1] != "csv":
     print("Not a csv file. Skipping...")
@@ -269,7 +274,7 @@ if dataset.split(".")[-1] != "csv":
 
 print("[*] Read anonymized dataset")
 df = pd.read_csv(dataset, dtype=object)
-portion = len(df.index) if portion == 0 else portion
+portion = len(df.index) if not portion else portion
 if "GID" not in df:
     print("No GID column. Skipping...")
     sys.exit()
