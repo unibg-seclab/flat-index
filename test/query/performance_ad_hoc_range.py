@@ -15,7 +15,6 @@
 
 
 import argparse
-from email.mime import base
 import glob
 import os
 import re
@@ -69,7 +68,7 @@ def plot(baseline, curves, path):
     plt.xticks([10, 25, 50, 75, 100])
 
     fig = plt.gcf()
-    fig.savefig(os.path.join("test/results/query/images/ad-hoc", path),
+    fig.savefig(os.path.join(images, path),
                 bbox_extra_artists=(legend, ),
                 bbox_inches='tight')
     if is_interactive: plt.show()
@@ -88,9 +87,13 @@ parser.add_argument('-i',
 args = parser.parse_args()
 is_interactive = args.interactive
 
+root = os.path.realpath(os.path.join(__file__, *([os.path.pardir] * 3)))
+results = os.path.join(root, "test", "results", "query", "k")
+images = os.path.join(results, "..", "images", "ad-hoc")
+
 dirs = [
-    "test/results/query/k/range-AGEP",
-    "test/results/query/k/range-WAGP",
+    os.path.join(results, "range-AGEP"),
+    os.path.join(results, "range-WAGP"),
 ]
 
 size_curves, size_worsening_curves = [], []
