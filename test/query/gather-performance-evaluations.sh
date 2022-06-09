@@ -26,33 +26,33 @@ CONFIG=$SCRIPT_DIR/../../config/usa2019/gid.json
 RESULTS=$SCRIPT_DIR/../results/query
 
 echo -e "\n[*] EVALUATE QUERY PERFORMANCE WITH VARYING K"
-$SCRIPT_DIR/automate-performance-evaluation.py -k 10 25 50 75 100 -l 20 -p password -q $SCRIPT_DIR/usa2019-punctual-AGEP.csv        -r 3 -s 1000 AGEP       $RESULTS/k/punctual-AGEP/
-$SCRIPT_DIR/automate-performance-evaluation.py -k 10 25 50 75 100 -l 20 -p password -q $SCRIPT_DIR/usa2019-range-AGEP.csv           -r 3 -s 1000 AGEP       $RESULTS/k/range-AGEP/
-$SCRIPT_DIR/automate-performance-evaluation.py -k 10 25 50 75 100 -l 20 -p password -q $SCRIPT_DIR/usa2019-punctual-OCCP.csv        -r 3 -s 1000 OCCP       $RESULTS/k/punctual-OCCP/
-$SCRIPT_DIR/automate-performance-evaluation.py -k 10 25 50 75 100 -l 20 -p password -q $SCRIPT_DIR/usa2019-range-OCCP.csv           -r 3 -s 1000 OCCP       $RESULTS/k/range-OCCP/
-$SCRIPT_DIR/automate-performance-evaluation.py -k 10 25 50 75 100 -l 20 -p password -q $SCRIPT_DIR/usa2019-punctual-ST.csv          -r 3 -s 1000 ST         $RESULTS/k/punctual-ST/
-$SCRIPT_DIR/automate-performance-evaluation.py -k 10 25 50 75 100 -l 20 -p password -q $SCRIPT_DIR/usa2019-range-ST.csv             -r 3 -s 1000 ST         $RESULTS/k/range-ST/
-$SCRIPT_DIR/automate-performance-evaluation.py -k 10 25 50 75 100 -l 20 -p password -q $SCRIPT_DIR/usa2019-punctual-WAGP.csv        -r 3 -s 1000 WAGP       $RESULTS/k/punctual-WAGP/
-$SCRIPT_DIR/automate-performance-evaluation.py -k 10 25 50 75 100 -l 20 -p password -q $SCRIPT_DIR/usa2019-range-WAGP.csv           -r 3 -s 1000 WAGP       $RESULTS/k/range-WAGP/
-$SCRIPT_DIR/automate-performance-evaluation.py -k 10 25 50 75 100 -l 20 -p password -q $SCRIPT_DIR/usa2019-punctual-OCCP-WAGP.csv   -r 3 -s 1000 OCCP WAGP  $RESULTS/k/punctual-OCCP-WAGP/
-$SCRIPT_DIR/automate-performance-evaluation.py -k 10 25 50 75 100 -l 20 -p password -q $SCRIPT_DIR/usa2019-range-OCCP-WAGP.csv      -r 3 -s 1000 OCCP WAGP  $RESULTS/k/range-OCCP-WAGP/
+$SCRIPT_DIR/automate-performance-evaluation.py -k 10 25 50 75 100 -l 20 -p password -r 3 -s 1000 $SCRIPT_DIR/usa2019-punctual-AGEP.csv      $RESULTS/k/punctual-AGEP/       
+$SCRIPT_DIR/automate-performance-evaluation.py -k 10 25 50 75 100 -l 20 -p password -r 3 -s 1000 $SCRIPT_DIR/usa2019-range-AGEP.csv         $RESULTS/k/range-AGEP/
+$SCRIPT_DIR/automate-performance-evaluation.py -k 10 25 50 75 100 -l 20 -p password -r 3 -s 1000 $SCRIPT_DIR/usa2019-punctual-OCCP.csv      $RESULTS/k/punctual-OCCP/
+$SCRIPT_DIR/automate-performance-evaluation.py -k 10 25 50 75 100 -l 20 -p password -r 3 -s 1000 $SCRIPT_DIR/usa2019-range-OCCP.csv         $RESULTS/k/range-OCCP/
+$SCRIPT_DIR/automate-performance-evaluation.py -k 10 25 50 75 100 -l 20 -p password -r 3 -s 1000 $SCRIPT_DIR/usa2019-punctual-ST.csv        $RESULTS/k/punctual-ST/
+$SCRIPT_DIR/automate-performance-evaluation.py -k 10 25 50 75 100 -l 20 -p password -r 3 -s 1000 $SCRIPT_DIR/usa2019-range-ST.csv           $RESULTS/k/range-ST/
+$SCRIPT_DIR/automate-performance-evaluation.py -k 10 25 50 75 100 -l 20 -p password -r 3 -s 1000 $SCRIPT_DIR/usa2019-punctual-WAGP.csv      $RESULTS/k/punctual-WAGP/
+$SCRIPT_DIR/automate-performance-evaluation.py -k 10 25 50 75 100 -l 20 -p password -r 3 -s 1000 $SCRIPT_DIR/usa2019-range-WAGP.csv         $RESULTS/k/range-WAGP/
+$SCRIPT_DIR/automate-performance-evaluation.py -k 10 25 50 75 100 -l 20 -p password -r 3 -s 1000 $SCRIPT_DIR/usa2019-punctual-OCCP-WAGP.csv $RESULTS/k/punctual-OCCP-WAGP/
+$SCRIPT_DIR/automate-performance-evaluation.py -k 10 25 50 75 100 -l 20 -p password -r 3 -s 1000 $SCRIPT_DIR/usa2019-range-OCCP-WAGP.csv    $RESULTS/k/range-OCCP-WAGP/
 
 echo -e "\n[*] EVALUATE QUERY PERFORMANCE WITH VARYNING K AND VARYNING BANDWIDTH"
-$SCRIPT_DIR/automate-performance-evaluation.py --back-end redis -b 1 10 100 1000 -c $CONFIG -k 10 25 50 75 100 -l 20 -p password -q $SCRIPT_DIR/usa2019-punctual-WAGP.csv      -r 3 -s 1000 WAGP         $RESULTS/bandwidth/punctual-WAGP/
-$SCRIPT_DIR/automate-performance-evaluation.py --back-end redis -b 1 10 100 1000 -c $CONFIG -k 10 25 50 75 100 -l 20 -p password -q $SCRIPT_DIR/usa2019-range-WAGP.csv         -r 3 -s 1000 WAGP         $RESULTS/bandwidth/range-WAGP/
-$SCRIPT_DIR/automate-performance-evaluation.py --back-end redis -b 1 10 100 1000 -c $CONFIG -k 10 25 50 75 100 -l 20 -p password -q $SCRIPT_DIR/usa2019-punctual-OCCP.csv      -r 3 -s 1000 OCCP         $RESULTS/bandwidth/punctual-OCCP/
-$SCRIPT_DIR/automate-performance-evaluation.py --back-end redis -b 1 10 100 1000 -c $CONFIG -k 10 25 50 75 100 -l 20 -p password -q $SCRIPT_DIR/usa2019-punctual-OCCP-WAGP.csv -r 3 -s 1000 OCCP WAGP    $RESULTS/bandwidth/punctual-OCCP-WAGP/
-$SCRIPT_DIR/automate-performance-evaluation.py --back-end redis -b 1 10 100 1000 -c $CONFIG -k 10 25 50 75 100 -l 20 -p password -q $SCRIPT_DIR/usa2019-range-OCCP-WAGP.csv    -r 3 -s 1000 OCCP WAGP    $RESULTS/bandwidth/range-OCCP-WAGP/
+$SCRIPT_DIR/automate-performance-evaluation.py --back-end redis -b 1 10 100 1000 -c $CONFIG -k 10 25 50 75 100 -l 20 -p password -r 3 -s 1000 $SCRIPT_DIR/usa2019-punctual-WAGP.csv         $RESULTS/bandwidth/punctual-WAGP/
+$SCRIPT_DIR/automate-performance-evaluation.py --back-end redis -b 1 10 100 1000 -c $CONFIG -k 10 25 50 75 100 -l 20 -p password -r 3 -s 1000 $SCRIPT_DIR/usa2019-range-WAGP.csv            $RESULTS/bandwidth/range-WAGP/
+$SCRIPT_DIR/automate-performance-evaluation.py --back-end redis -b 1 10 100 1000 -c $CONFIG -k 10 25 50 75 100 -l 20 -p password -r 3 -s 1000 $SCRIPT_DIR/usa2019-punctual-OCCP.csv         $RESULTS/bandwidth/punctual-OCCP/
+$SCRIPT_DIR/automate-performance-evaluation.py --back-end redis -b 1 10 100 1000 -c $CONFIG -k 10 25 50 75 100 -l 20 -p password -r 3 -s 1000 $SCRIPT_DIR/usa2019-punctual-OCCP-WAGP.csv    $RESULTS/bandwidth/punctual-OCCP-WAGP/
+$SCRIPT_DIR/automate-performance-evaluation.py --back-end redis -b 1 10 100 1000 -c $CONFIG -k 10 25 50 75 100 -l 20 -p password -r 3 -s 1000 $SCRIPT_DIR/usa2019-range-OCCP-WAGP.csv       $RESULTS/bandwidth/range-OCCP-WAGP/
 
 echo -e "\n[*] EVALUATE QUERY PERFORMANCE WITH K=50 AND VARYNING LATENCY"
-$SCRIPT_DIR/automate-performance-evaluation.py -k 50 -l 50 100 150 200 -p password -q $SCRIPT_DIR/usa2019-punctual-WAGP.csv      -r 3 -s 1000 WAGP         $RESULTS/latency/punctual-WAGP/
-$SCRIPT_DIR/automate-performance-evaluation.py -k 50 -l 50 100 150 200 -p password -q $SCRIPT_DIR/usa2019-range-WAGP.csv         -r 3 -s 1000 WAGP         $RESULTS/latency/range-WAGP/
-$SCRIPT_DIR/automate-performance-evaluation.py -k 50 -l 50 100 150 200 -p password -q $SCRIPT_DIR/usa2019-punctual-OCCP.csv      -r 3 -s 1000 OCCP         $RESULTS/latency/punctual-OCCP/
-$SCRIPT_DIR/automate-performance-evaluation.py -k 50 -l 50 100 150 200 -p password -q $SCRIPT_DIR/usa2019-punctual-OCCP-WAGP.csv -r 3 -s 1000 OCCP WAGP    $RESULTS/latency/punctual-OCCP-WAGP/
-$SCRIPT_DIR/automate-performance-evaluation.py -k 50 -l 50 100 150 200 -p password -q $SCRIPT_DIR/usa2019-range-OCCP-WAGP.csv    -r 3 -s 1000 OCCP WAGP    $RESULTS/latency/range-OCCP-WAGP/
+$SCRIPT_DIR/automate-performance-evaluation.py -k 50 -l 50 100 150 200 -p password -r 3 -s 1000 $SCRIPT_DIR/usa2019-punctual-WAGP.csv       $RESULTS/latency/punctual-WAGP/
+$SCRIPT_DIR/automate-performance-evaluation.py -k 50 -l 50 100 150 200 -p password -r 3 -s 1000 $SCRIPT_DIR/usa2019-range-WAGP.csv          $RESULTS/latency/range-WAGP/
+$SCRIPT_DIR/automate-performance-evaluation.py -k 50 -l 50 100 150 200 -p password -r 3 -s 1000 $SCRIPT_DIR/usa2019-punctual-OCCP.csv       $RESULTS/latency/punctual-OCCP/
+$SCRIPT_DIR/automate-performance-evaluation.py -k 50 -l 50 100 150 200 -p password -r 3 -s 1000 $SCRIPT_DIR/usa2019-punctual-OCCP-WAGP.csv  $RESULTS/latency/punctual-OCCP-WAGP/
+$SCRIPT_DIR/automate-performance-evaluation.py -k 50 -l 50 100 150 200 -p password -r 3 -s 1000 $SCRIPT_DIR/usa2019-range-OCCP-WAGP.csv     $RESULTS/latency/range-OCCP-WAGP/
 
 # echo -e "\n[*] EVALUATE QUERY PERFORMANCE WITH VARYNING BANDWIDTH, SERIALIZATION FORMAT AND COMPRESSION ALGORITHM"
-# $SCRIPT_DIR/automate-performance-evaluation.py --back-end redis -b 1 10 --compression none lz4 snappy zstd -c $CONFIG -k 100 -l 20 -p password -q $SCRIPT_DIR/usa2019-punctual-WAGP.csv      -r 3 --serialization json msgpack pickle -s 1000 WAGP         $RESULTS/compression/punctual-WAGP/
-# $SCRIPT_DIR/automate-performance-evaluation.py --back-end redis -b 1 10 --compression none lz4 snappy zstd -c $CONFIG -k 100 -l 20 -p password -q $SCRIPT_DIR/usa2019-range-WAGP.csv         -r 3 --serialization json msgpack pickle -s 1000 WAGP         $RESULTS/compression/range-WAGP/
-# $SCRIPT_DIR/automate-performance-evaluation.py --back-end redis -b 1 10 --compression none lz4 snappy zstd -c $CONFIG -k 100 -l 20 -p password -q $SCRIPT_DIR/usa2019-punctual-OCCP-WAGP.csv -r 3 --serialization json msgpack pickle -s 1000 OCCP WAGP    $RESULTS/compression/punctual-OCCP-WAGP/
-# $SCRIPT_DIR/automate-performance-evaluation.py --back-end redis -b 1 10 --compression none lz4 snappy zstd -c $CONFIG -k 100 -l 20 -p password -q $SCRIPT_DIR/usa2019-range-OCCP-WAGP.csv    -r 3 --serialization json msgpack pickle -s 1000 OCCP WAGP    $RESULTS/compression/range-OCCP-WAGP/
+# $SCRIPT_DIR/automate-performance-evaluation.py --back-end redis -b 1 10 --compression none lz4 snappy zstd -c $CONFIG -k 100 -l 20 -p password -r 3 --serialization json msgpack pickle -s 1000 $SCRIPT_DIR/usa2019-punctual-WAGP.csv      $RESULTS/compression/punctual-WAGP/
+# $SCRIPT_DIR/automate-performance-evaluation.py --back-end redis -b 1 10 --compression none lz4 snappy zstd -c $CONFIG -k 100 -l 20 -p password -r 3 --serialization json msgpack pickle -s 1000 $SCRIPT_DIR/usa2019-range-WAGP.csv         $RESULTS/compression/range-WAGP/
+# $SCRIPT_DIR/automate-performance-evaluation.py --back-end redis -b 1 10 --compression none lz4 snappy zstd -c $CONFIG -k 100 -l 20 -p password -r 3 --serialization json msgpack pickle -s 1000 $SCRIPT_DIR/usa2019-punctual-OCCP-WAGP.csv $RESULTS/compression/punctual-OCCP-WAGP/
+# $SCRIPT_DIR/automate-performance-evaluation.py --back-end redis -b 1 10 --compression none lz4 snappy zstd -c $CONFIG -k 100 -l 20 -p password -r 3 --serialization json msgpack pickle -s 1000 $SCRIPT_DIR/usa2019-range-OCCP-WAGP.csv    $RESULTS/compression/range-OCCP-WAGP/

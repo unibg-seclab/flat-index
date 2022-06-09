@@ -64,10 +64,12 @@ if __name__ == "__main__":
                     'configurations in order to evaluate their performance' +
                     'with varying network.'
     )
-    parser.add_argument('column',
-                        metavar='COLUMN',
-                        nargs='+',
-                        help='one or more columns on which to run queries')
+    parser.add_argument('query',
+                        metavar='QUERY',
+                        help='path to the list of queries')
+    parser.add_argument('output',
+                        metavar='OUPUT',
+                        help='path of the directory where to store results')
     parser.add_argument('--back-end',
                         metavar='BACK-END',
                         nargs='+',
@@ -107,16 +109,9 @@ if __name__ == "__main__":
                         type=int,
                         default=[0],
                         help='one or more latencies in ms (default: 0 ms)')
-    parser.add_argument('output',
-                        metavar='OUPUT',
-                        help='path of the directory where to store results')
     parser.add_argument('-p',
                         '--password',
                         help='password necessary to read the mapping')
-    parser.add_argument('-q',
-                        '--query',
-                        metavar='QUERY',
-                        help='path to the list of queries')
     parser.add_argument('-r',
                         '--reps',
                         metavar='REPETITIONS',
@@ -138,16 +133,15 @@ if __name__ == "__main__":
                              'pickle')
     args = parser.parse_args()
 
-    columns = args.column
+    queries = args.query
+    output = args.output
     backends = args.back_end
     bandwidths = args.bandwidth
     compressions = args.compression
     configs = args.config
     ks = args.k
     latencies = args.latency
-    output = args.output
     pw = args.password.encode("utf-8") if args.password else None
-    queries = args.query
     reps = args.reps
     sample_size = args.sample_size
     serializations = args.serialization
@@ -179,21 +173,13 @@ if __name__ == "__main__":
     output = os.path.realpath(output)
     if queries: queries = os.path.realpath(queries)
 
-    # Absolute script paths
-    query_script = os.path.join(test, "multi_column_query.py")
+    # Absolute script path
     run_query_script = os.path.join(test, "random_query.py")
 
     # Change current working directory to reuse make recipies
     os.chdir(root)
 
-    print(f"[*] Columns: {columns}")
     subprocess.run(["make", "upload_plain", f"INPUT={plain}"])
-
-    if not queries:
-        # Run script to gather a list of queries
-        print(f"[*] Retrieve a list of queries")
-        queries = os.path.join(output, "queries.csv")
-        subprocess.run([query_script, POSTGRES, *columns, queries])
 
     # Retrieve list of network configurations
     network_emulation_params = list(itertools.product(bandwidths, latencies))
