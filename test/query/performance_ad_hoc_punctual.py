@@ -98,12 +98,9 @@ dirs = [
     os.path.join(results, "punctual-ST"),
 ]
 
-print(os.getcwd())
-
 size_curves, size_worsening_curves = [], []
 labels = []
 for dir in dirs:
-    print(dir)
     column = dir.rsplit('-', 1)[1]
     print(f"[*] COLUMN: {column}")
     baseline = glob.glob(os.path.join(dir, f"baseline*.csv"))[0]
