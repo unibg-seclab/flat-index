@@ -23,7 +23,7 @@ import pandas as pd
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='Shuffle tuples and group-id values to ensure ordering ' +
-                    'does not leak information about the k-flat process, ' +
+                    'does not leak information about the flattening process, ' +
                     'nor the original dataset'
     )
     parser.add_argument('dataset',

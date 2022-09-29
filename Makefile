@@ -88,8 +88,8 @@ addlicense:
 _setup_submodule:
 	@ git submodule update --init
 	@ cd submodules/spark-mondrian; git checkout k-flat;
-	@ $(eval configs := $(shell ls k-flat-config/))
-	@ $(foreach config,$(configs), cp k-flat-config/$(config) submodules/spark-mondrian/distributed/config;)
+	@ $(eval configs := $(shell ls partitioning-config/))
+	@ $(foreach config,$(configs), cp partitioning-config/$(config) submodules/spark-mondrian/distributed/config;)
 
 ### MANAGE DATASETS ###
 datasets: | _usa2019 _transactions
@@ -134,7 +134,7 @@ WORKERS := 4
 _k_flat:
 	@ cp $(INPUT) submodules/spark-mondrian/distributed/dataset/$(notdir $(INPUT))
 	@ $(foreach k,$(K), \
-			echo "[*] RUNNING K-FLAT ALGORITHM ON $(INPUT) WITH K=$(k)..."; \
+			echo "[*] RUNNING PARTITION ALGORITHM ON $(INPUT) WITH K=$(k)..."; \
 	    	$(MAKE) -C submodules/spark-mondrian/distributed $(basename $(notdir $(INPUT))) K=$(k) CONFIG=$(basename $(notdir $(INPUT))) WORKERS=$(WORKERS); \
         	cp submodules/spark-mondrian/distributed/anonymized/$(notdir $(INPUT)) $(basename $(INPUT))_$(k).csv; \
 			$(PYTHON) dataset/script/shuffle.py $(basename $(INPUT))_$(k).csv;)

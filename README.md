@@ -1,4 +1,4 @@
-# k-flat Secure Indexing for encrypted databases
+# Multi-Dimensional Flat Indexing for Encrypted Databases
 
 This repository contains a Python library implementing the secure index
 construction and its runtime usage, and a complete system showing
@@ -12,11 +12,11 @@ on PostgreSQL and Redis, and how to query them.
 
 ## Workflow
 
-To enable the k-flat secure indexing of an encrypted dataset, multiple steps
+To enable the flat secure indexing of an encrypted dataset, multiple steps
 are necessary:
 
-1. construction of the k-flat representation
-2. construction of the maps on top of the k-fat representation
+1. construction of the flat representation
+2. construction of the maps on top of the flat representation
 3. dataset wrapping
 4. dataset outsourcing
 
