@@ -21,7 +21,6 @@ from collections import defaultdict
 
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
-from numpy.core.fromnumeric import compress
 import pandas as pd
 
 
