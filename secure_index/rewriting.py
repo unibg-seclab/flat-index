@@ -126,16 +126,38 @@ def to_string(labels):
 ROTATE = {"=": "=", ">": "<", "<": ">", ">=": "<=", "<=": ">=", "<>": "<>"}
 
 def rewrite_comparisons(mapping, state, kv_store_data=None):
+    """Rewrite query comparisons using mapping information.
+
+    This function rewrites comparisons inplace assuming there is no use of the
+    NOT keyword within the WHERE clause.
+
+    Rewriting of comparisons with the BETWEEN and IN operators work only with
+    key-value store due to limitations of the SQL parser.
+
+    :mapping: Data structure keeping column mapping information.
+    :state: Information about the query to rewrite.
+    :kv_store_data: Dictionary holding for each column the keys to request to
+        the key-value store. Defaults to None.
+    """
     FUNCTIONS = {
         "=": mapping.eq,  ">": mapping.gt, "<": mapping.lt, ">=": mapping.ge,
         "<=": mapping.le, "<>": mapping.neq, "in": mapping.in_values,
         "between": mapping.between
     }
 
+    if not state.comparisons and kv_store_data is not None:
+        column = mapping.schema[0]
+        labels = (token
+                  for tokens in mapping.get_tokens(column)
+                  for token in tokens)
+
+        column = column if not mapping.is_gid(column) else "GroupId"
+        kv_store_data[column].update(labels)
+
     for comparison in state.comparisons:
         left, op, right, *additional = filter(comparison.tokens)
         if len(additional):
-            additional = additional[0]
+            additional = additional[1]
 
         if isinstance(left, S.Identifier) and isinstance(right, S.Identifier):
             raise Exception("Comparisons among two columns are not supported.")

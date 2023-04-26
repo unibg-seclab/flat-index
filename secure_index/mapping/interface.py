@@ -39,16 +39,6 @@ class MultidimensionalMapping(ABC):
         pass
 
     @abstractmethod
-    def get_runtime_tokens_dictionary(self, column):
-        """Return a dictionary mapping the generalization to all the runtime tokens.
-        
-        :return: Dictionary (generalization value) -> iterator(list of tokens) the mapping stores on the given column.
-
-        """
-        pass
-
-
-    @abstractmethod
     def get_tokens(self, column):
         """Return tokens the mapping stores on the given column.
         

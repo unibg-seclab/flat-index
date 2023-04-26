@@ -24,7 +24,7 @@ setup(
         "intervaltree==3.1.0",
         "pynacl==1.4.0",
         "pyroaring==0.3.3",
-        "sqlparse==0.4.1",
+        "sqlparse==0.4.4",
     ],
     url="http://github.com/unibg-seclab/secure_index",
     author="UniBG Seclab",

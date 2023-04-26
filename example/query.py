@@ -241,9 +241,9 @@ if __name__ == '__main__':
             script = engine.register_script(script_file.read())
 
     print("[*] Run some test query")
+    test(f"SELECT * FROM {table}")
     test(f"SELECT * FROM {table} WHERE {table}.\"AGE\" = 18")
     test(f"SELECT * FROM {table} WHERE \"{table}\".\"AGE\" = 18")
-    test(f"SELECT * FROM {table} WHERE \"AGE\" IN (18, 30, 95)")
     test(f"SELECT \"AGE\", \"STATEFIP\", \"OCC\" FROM {table}" +
             " WHERE \"AGE\"<=18")
     test(f"SELECT COUNT(*) FROM \"{table}\" WHERE 18 >= \"AGE\" /*comment*/")
@@ -254,4 +254,5 @@ if __name__ == '__main__':
     test(f"SELECT COUNT(*) FROM {table} WHERE 20>\"AGE\"" +
             " GROUP BY \"AGE\" HAVING COUNT(*) > 10")
     test(f"SELECT COUNT(*) FROM {table} WHERE 90< \"AGE\" ORDER BY \"AGE\"")
-    #test(f"SELECT * FROM {table} WHERE \"AGE\" BETWEEN 18 AND 20")
+    # test(f"SELECT * FROM {table} WHERE \"AGE\" IN (18, 30, 95)")
+    # test(f"SELECT * FROM {table} WHERE \"AGE\" BETWEEN 18 AND 20")

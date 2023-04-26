@@ -93,10 +93,6 @@ class HeterogeneousMapping(MultidimensionalMapping):
         mapping = self._get_column_mapping(column)
         return mapping.get_generalizations()
 
-    def get_runtime_tokens_dictionary(self, column):
-        mapping = self._get_column_mapping(column)        
-        return mapping.get_runtime_tokens_dictionary()
-
     def get_tokens(self, column):
         mapping = self._get_column_mapping(column)
         return mapping.get_tokens()

@@ -29,7 +29,7 @@ class State:
     :comparisons: List of tokens representing comparisons in the where clause.
     :other: Position of the first occurance of a group by, having or order by
         clause.
-    :comparisons: A list of comparisons the query uses as selection.
+    :comparisons: List of comparisons the query uses as selection.
     """
 
     def __init__(self, tokens):
@@ -350,7 +350,7 @@ PRECEDENCE = {
 OPERATORS = list(PRECEDENCE.keys())
 
 
-# TODO: support rewrite of BETWEEN statement
+# TODO: support rewrite of IN and BETWEEN statements
 # TODO: handle sqlparse issue #370 on '-' arithmetic operator
 def _expression(state, tokens):
     """Resolve a SQL expression.
@@ -363,8 +363,9 @@ def _expression(state, tokens):
     args = []
     ops = []
 
-    def _shift(val, args):
-        args.append(val)
+    def _shift(val, args, pos=None):
+        item = (val, pos) if pos is not None else val
+        args.append(item)
 
     def _reduce(args, ops):
         assert len(ops) >= 1
@@ -373,15 +374,25 @@ def _expression(state, tokens):
         # ternary operators
         if ops and (ops[-1], op_name) in TERNARY:
             assert len(args) >= 3
-            ops.pop()
-            args.pop()  # right
-            args.pop()  # middle
-            args.pop()  # left
+            op = ops.pop()
+            right, end = args.pop()
+            middle, _ = args.pop()
+            left, start = args.pop()
+
+            # Treat "... BETWEEN ... AND ..." as a comparison
+            string_to_parse = f"{left} BETWEEN {middle} AND {right}"
+            comparison = sqlparse.parse(string_to_parse)[0]
+            state.comparisons.append(comparison)
         # binary operators
         elif op_name in BINARY:
             assert len(args) >= 2
-            args.pop()  # right
-            args.pop()  # left
+            right, end = args.pop()
+            left, start = args.pop()
+
+            # Treat "... IN ..." as a comparison
+            if op_name == "IN":
+                comparison = sqlparse.parse(f"{left} IN {right}")[0]
+                state.comparisons.append(comparison)
         # unary operators
         elif op_name in UNARY:
             assert len(args) >= 1
@@ -390,8 +401,9 @@ def _expression(state, tokens):
             print(f"Unexpected keyword '{op_name}'.")
         args.append("placeholder")
 
-    count = 0
-    for tok in tokens:
+    i = 0
+    while i < len(tokens):
+        tok = tokens[i]
         if DEBUG:
             print(tok, args, ops)
 
@@ -403,13 +415,13 @@ def _expression(state, tokens):
                 raise Exception("Subqueries are not supported yet.")
             
             _comma_separated_list(state, subtokens, item_resolver=_expression)
-            _shift("parenthesis", args)
+            _shift(tok.normalized, args, i)
 
         # sqlparse packages up comparisons
         elif isinstance(tok, S.Comparison):
             state.comparisons.append(tok)
             _expression(state, tok.tokens)
-            _shift("comparison", args)
+            _shift("comparison", args, i)
 
         # sqlparse packages up arithmetic and bitwise operations
         elif isinstance(tok, S.Operation):
@@ -447,7 +459,7 @@ def _expression(state, tokens):
                 # remove ordering information
                 if tok.get_ordering():
                     tok = tok.tokens[0]
-            _shift(tok.normalized, args)
+            _shift(tok.normalized, args, i)
 
         # literal
         elif tok.match(T.Keyword, ["^NULL$", "^NOT\\s+NULL$"], regex=True) or \
@@ -460,7 +472,7 @@ def _expression(state, tokens):
                               T.Number.Integer,
                               T.String,
                               T.String.Symbol]:
-            _shift(tok.normalized, args)
+            _shift(tok.normalized, args, i)
 
         # whitespaces and comments
         elif tok.is_whitespace or isinstance(tok, S.Comment) or \
@@ -468,19 +480,15 @@ def _expression(state, tokens):
             pass
 
         else:
-            # don't count unconsumed tokens
-            if count:
-                count -= 1
             break
 
-        count += 1
+        i += 1
 
     while ops and len(args) >= 1:
         _reduce(args, ops)
 
     if len(args) != 1:
         raise Exception("invalid comparison clause: %s" % tokens)
-    return count
 
 
 if __name__ == "__main__":

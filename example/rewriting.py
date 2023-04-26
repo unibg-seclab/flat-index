@@ -92,9 +92,9 @@ else:
 
 rewrite_table = REWRITE_TABLES[repr]
 
+test(f"SELECT * FROM wrapped")
 test("SELECT * FROM wrapped WHERE wrapped.\"AGE\" = 18")
 test("SELECT * FROM wrapped WHERE \"wrapped\".\"AGE\" = 18")
-test("SELECT * FROM wrapped WHERE \"AGE\" IN (18, 30, 95)")
 test("SELECT \"AGE\", \"STATEFIP\", \"OCC\" FROM wrapped WHERE \"AGE\"<=18")
 test("SELECT COUNT(*) FROM \"wrapped\" WHERE 18 >= \"AGE\" /*comment*/")
 test("SELECT COUNT(*) FROM wrapped WHERE \"AGE\">200-- other comment")
@@ -103,4 +103,5 @@ test("SELECT COUNT(*) FROM wrapped WHERE \"AGE\" <20 GROUP BY \"AGE\"")
 test("SELECT COUNT(*) FROM wrapped WHERE 20>\"AGE\" " +
      "GROUP BY \"AGE\" HAVING COUNT(*) > 10")
 test("SELECT COUNT(*) FROM wrapped WHERE 90< \"AGE\" ORDER BY \"AGE\"")
-test("SELECT * FROM wrapped WHERE \"AGE\" BETWEEN 18 AND 20")
+#test("SELECT * FROM wrapped WHERE \"AGE\" IN (18, 30, 95)")
+#test("SELECT * FROM wrapped WHERE \"AGE\" BETWEEN 18 AND 20")
