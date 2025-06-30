@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM postgres:13.3
+FROM postgres:14
 
 # Install necessary software to emulate network delay
 RUN ["apt-get", "update"]

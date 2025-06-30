@@ -87,7 +87,7 @@ addlicense:
 
 _setup_submodule:
 	@ git submodule update --init
-	@ cd submodules/spark-mondrian; git checkout k-flat;
+	@ cd submodules/spark-mondrian; # git checkout k-flat;
 	@ $(eval configs := $(shell ls partitioning-config/))
 	@ $(foreach config,$(configs), cp partitioning-config/$(config) submodules/spark-mondrian/distributed/config;)
 
@@ -213,21 +213,24 @@ stop: check_deps
 
 ### UPLOAD DATASET TO SERVER ###
 upload_plain: $(VENV) postgres
-	@ sleep 2
+	@ sleep 5
 	@ echo -e "\n[*] UPLOAD PLAIN DATASET TO POSTGRESQL DATABASE"
 	$(PYTHON) script/upload.py --name plain $(INPUT) $(POSTGRES_URL)
 
 upload: $(VENV) $(OUTPUT) postgres
+	@ sleep 5
 	@ echo -e "\n[*] UPLOAD DATASET TO POSTGRESQL DATABASE"
 	$(PYTHON) script/upload.py $(OUTPUT) $(POSTGRES_URL)
 
 upload_kv: $(VENV) $(OUTPUT_KV) redis
+	@ sleep 5
 	@ echo -e "\n[*] FLUSH REDIS DATABASE"
 	echo "FLUSHALL" | nc -q 0 localhost 6379
 	@ echo -e "\n[*] UPLOAD DATASET TO REDIS"
 	$(PYTHON) script/upload.py --kvstore $(OUTPUT_KV) $(REDIS_URL)
 
 upload_kv_mapping: $(VENV) $(OUTPUT_KV_MAP) redis
+	@ sleep 5
 	@ echo -e "\n[*] FLUSH REDIS DATABASE"
 	echo "FLUSHALL" | nc -q 0 localhost 6379
 	@ echo -e "\n[*] UPLOAD MAPPINGs AND DATASET TO REDIS"
@@ -235,11 +238,13 @@ upload_kv_mapping: $(VENV) $(OUTPUT_KV_MAP) redis
 	@ $(foreach name,$(names), $(PYTHON) script/upload.py --kvstore --name $(basename $(name)) "$(dir $(OUTPUT_KV_MAP))$(name)" $(REDIS_URL);)
 
 upload_hybrid: $(VENV) $(OUTPUT_HYBRID) postgres
+	@ sleep 5
 	@ echo -e "\n[*] UPLOAD MAPPING TABLE AND DATASET TO POSTGRESQL DATABASE"
 	@ $(eval tables := $(shell ls $(dir $(OUTPUT_HYBRID))))
 	@ $(foreach table,$(tables), $(PYTHON) script/upload.py --name $(basename $(table)) "$(dir $(OUTPUT_HYBRID))$(table)" $(POSTGRES_URL);)
 
 upload_norm: $(VENV) $(OUTPUT_NORM) postgres
+	@ sleep 5
 	@ echo -e "\n[*] UPLOAD MAPPING TABLEs AND DATASET TO POSTGRESQL DATABASE"
 	@ $(eval tables := $(shell ls $(dir $(OUTPUT_NORM))))
 	@ $(foreach table,$(tables), $(PYTHON) script/upload.py --name $(basename $(table)) "$(dir $(OUTPUT_NORM))$(table)" $(POSTGRES_URL);)
