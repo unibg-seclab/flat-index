@@ -339,12 +339,12 @@ test_categorical_mapping_gid: $(VENV)
 DELAY		:= 200
 define run_with_network_emulation
 	@ echo -e "\n[*] EMULATE A 1 Gbit NETWORK WITH A LATENCY OF $(DELAY) ms"
-	@ docker exec secure_index_$(1)_1 tc qdisc add dev eth0 root handle 1: netem delay $(DELAY)ms
-	@ docker exec secure_index_$(1)_1 tc qdisc add dev eth0 parent 1: tbf rate 1gbit burst 10mbit latency 1ms
+	@ docker exec k-flat-index_$(1)_1 tc qdisc add dev eth0 root handle 1: netem delay $(DELAY)ms
+	@ docker exec k-flat-index_$(1)_1 tc qdisc add dev eth0 parent 1: tbf rate 1gbit burst 10mbit latency 1ms
 	@ echo -e "\n[*] TEST QUERY PERFORMANCE"
 	@ PYTHONIOENCODING=UTF-8 $(PYTHON) $(2)
 	@ echo -e "\n[*] REMOVE NETWORK BANDWIDTH LIMIT AND LATENCY"
-	@ docker exec secure_index_$(1)_1 tc qdisc del dev eth0 root
+	@ docker exec k-flat-index_$(1)_1 tc qdisc del dev eth0 root
 endef
 
 BASELINE	:= test/results/query/baseline/usa2018

@@ -29,11 +29,11 @@ def add_network_emulation(backend, bandwidth, latency):
     print(f"Adding network emulation with a {bandwidth} Mbps bandwidth and " +
           f"{latency} ms latency...")
     subprocess.run([
-        "docker", "exec", f"secure_index_{backend}_1", "tc", "qdisc", "add",
+        "docker", "exec", f"k-flat-index_{backend}_1", "tc", "qdisc", "add",
         "dev", "eth0", "root", "handle", "1:", "netem", "delay", f"{latency}ms"
     ])
     subprocess.run([
-        "docker", "exec", f"secure_index_{backend}_1", "tc", "qdisc", "add",
+        "docker", "exec", f"k-flat-index_{backend}_1", "tc", "qdisc", "add",
         "dev", "eth0", "parent", "1:", "tbf", "rate", f"{bandwidth}mbit",
         "burst", "10mbit", "latency", "1ms"
     ])
@@ -42,7 +42,7 @@ def add_network_emulation(backend, bandwidth, latency):
 def remove_network_emulation(backend):
     print(f"Removing network emulation...")
     subprocess.run([
-        "docker", "exec", f"secure_index_{backend}_1", "tc", "qdisc", "del",
+        "docker", "exec", f"k-flat-index_{backend}_1", "tc", "qdisc", "del",
         "dev", "eth0", "root"
     ])
 
